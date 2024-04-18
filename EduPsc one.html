@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduPsc</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        /* Premium design styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #2f414a;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background-color: #273d47;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        h1, h2 {
+            text-align: center;
+            color:#b04c70 ;
+        }
+        p {
+            margin-bottom: 15px;
+        }
+        .question {
+            color: #ffffff;
+            margin-bottom: 25px;
+            font-size: 15px;
+        }
+        .answer {
+            display: block;
+            padding: 11px;
+            color: #ffffff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        .answer:hover {
+            background-color: #582e73;
+        }
+        .answer.correct {
+            background-color: #28a745;
+            color: #ffc107;
+        }
+        .answer.incorrect {
+            background-color: #dc3545;
+        }
+        .progress-bar {
+            background-color: #000000;
+            border-radius: 5px;
+            height: 20px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .progress-bar .progress {
+            background-color: #47b03e;
+            border-radius: 5px;
+            height: 100%;
+            width: 100%;
+            transition: width 1s linear;
+        }
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #F0ECE1;
+            font-size: 16px;
+        }
+        .question-counter {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 18px;
+            color: #1486de;
+        }
+        .score {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 18px;
+            color: #1486de;
+        }
+/* The secret sauce that enables gradient rotation. NOTE: does not work in all browsers. https://caniuse.com/?search=%40property */
+    @property --border-angle-1 {
+      syntax: "<angle>";
+      inherits: true;
+      initial-value: 0deg;
+    }
+
+    @property --border-angle-2 {
+      syntax: "<angle>";
+      inherits: true;
+      initial-value: 90deg;
+    }
+
+    @property --border-angle-3 {
+      syntax: "<angle>";
+      inherits: true;
+      initial-value: 180deg;
+    }
+
+
+    /* sRGB color. */
+    :root {
+      --bright-blue: rgb(0, 100, 255);
+      --bright-green: rgb(0, 255, 0);
+      --bright-red: rgb(255, 0, 0);
+      --background: #2f414a;
+      --foreground: white;
+      --border-size: 2px;
+      --border-radius: 0.75em;
+    }
+
+    /* Display-P3 color, when supported. */
+    @supports (color: color(display-p3 1 1 1)) {
+      :root {
+        --bright-blue: color(display-p3 0 0.2 1);
+        --bright-green: color(display-p3 0.4 1 0);
+        --bright-red: color(display-p3 1 0 0);
+      }
+    }
+
+    @keyframes rotateBackground {
+      to { --border-angle-1: 360deg; }
+    }
+
+    @keyframes rotateBackground2 {
+      to { --border-angle-2: -270deg; }
+    }
+
+    @keyframes rotateBackground3 {
+      to { --border-angle-3: 540deg; }
+    }
+
+    body {
+      background: var(--background);
+      color: var(--foreground);
+      min-height: 100dvh;
+      display: grid;
+      place-content: center;
+      margin: 0;
+      font-family: "Aspekta";
+    }
+        .skip-button {
+      --border-angle-1: 0deg;
+      --border-angle-2: 90deg;
+      --border-angle-3: 180deg;
+      color: inherit;
+      font-size: calc(0.8rem + 4vmin);
+      font-family: inherit;
+      border: 0;
+      padding: var(--border-size);
+      display: flex;
+      width: max-content;
+      border-radius: var(--border-radius);
+      background-color: transparent;
+      background-image: conic-gradient(
+          from var(--border-angle-1) at 10% 15%,
+          transparent,
+          var(--bright-blue) 10%,
+          transparent 30%,
+          transparent
+        ),
+        conic-gradient(
+          from var(--border-angle-2) at 70% 60%,
+          transparent,
+          var(--bright-green) 10%,
+          transparent 60%,
+          transparent
+        ),
+        conic-gradient(
+          from var(--border-angle-3) at 50% 20%,
+          transparent,
+          var(--bright-red) 10%,
+          transparent 50%,
+          transparent
+        );
+      animation: 
+        rotateBackground 3s linear infinite,
+        rotateBackground2 8s linear infinite,
+        rotateBackground3 13s linear infinite;
+    }
+
+    /* Change this background to transparent to see how the gradient works */
+    button div {
+      background: var(--background); 
+      padding: 1em 1.5em;
+      border-radius: calc(var(--border-radius) - var(--border-size));
+      color: var(--foreground);
+    }
+
+    @font-face {
+      font-family: "Aspekta";
+      font-weight: normal;
+      src: url("https://assets.codepen.io/240751/Aspekta-300.woff2") format("woff2");
+    }
+        .result-container {
+            background-color: #324da6;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            margin-top: 40px;
+        }
+        .result-message {
+            text-align: center;
+            font-size: 24px;
+            color: #ffd500;
+            margin-bottom: 20px;
+        }
+        .result-stats {
+            text-align: center;
+        }
+        .result-stats p {
+            margin: 5px 0;
+            font-size: 18px;
+            color: #ffffff;
+        }
+        .restart-button {
+            background-color: #6c1fa6;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: block;
+            margin: 0 auto;
+            margin-top: 20px;
+        }
+        .restart-button:hover {
+            background-color: #0056b3;
+        }
+        .answer-key-button {
+            position: absolute;
+            bottom: 15px;
+            right: 10px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .answer-key-button:hover {
+            background-color: #218838;
+        }
+        .pause-resume-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #5b6f80;
+            color: #fff;
+            border: none;
+            border-radius: 200px;
+            padding: 4px 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .pause-resume-button:hover {
+            background-color: #4e708a;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><span style="color: #FF7722;">Ed</span><span style="color: #FFFFFF;">uP</span><span style="color: #1ea63d;">sc</span></h1>
+        <div class="progress-bar">
+            <div class="progress" id="progressBar"></div>
+            <div class="progress-text">Time Left: <span id="timer">15</span> sec</div>
+        </div>
+        <div class="score">Qns: <span id="score">0</span></div>
+        <div class="question-counter"><span id="currentQuestion"></span><span id="totalQuestions"></span></div>
+        <div id="quizContent" style="display: none;"></div>
+        <button class="skip-button" id="skipButton" style="display: none;">Skip Question</button>
+        <button class="start-button" id="startButton"><span style="color: #000000;">Start Quiz</span></button>
+        <a class="answer-key-button" id="answerKeyButton" href="https://www.youtube.com" target="_blank">Answer Key</a>
+        <button class="pause-resume-button" id="pauseResumeButton">Pause</button>
+    </div>
+
+    <script>
+        // Define the quizData array containing questions and answers
+        const quizData = [
+            {
+    "question": "ഗുരുവായൂർ സത്യാഗ്രഹം നടന്ന വർഷമേത്?",
+    "answers": ["(a) 1925", "(b) 1921", "(c) 1931", "(d) 1947"],
+    "correctAnswer": "(c) 1931"
+},
+{
+    "question": "മലബാർ കലാപം നടന്ന വർഷമേത്?",
+    "answers": ["(a) 1925", "(b) 1921", "(c) 1931", "(d) 1947"],
+    "correctAnswer": "(b) 1921"
+},
+{
+    "question": "മലയാളം അച്ചടിയുടെ പിതാവെന്ന് വിശേഷിപ്പിക്കുന്നത് ആരെ?",
+    "answers": ["(a) ഗുണ്ടർട്ട്", "(b) ഒ. ചന്തുമേനോൻ", "(c) എഴുത്തച്ഛൻ", "(d) ബഞ്ചമിൻ ബയ‌ലി"],
+    "correctAnswer": "(d) ബഞ്ചമിൻ ബയ‌ലി"
+},
+{
+    "question": "ഉദയം പേരൂർ സൂനഹദോസ് നടന്ന വർഷം ഏത്?",
+    "answers": ["(a) 1653", "(b) 1768", "(c) 1498", "(d) 1599"],
+    "correctAnswer": "(d) 1599"
+},
+{
+    "question": "മലയാള ഭാഷയിൽ അച്ചടിക്കപ്പെട്ട ആദ്യകൃതി ഏത്?",
+    "answers": ["(a) രാജ്യസമാചാരം", "(b) സംക്ഷേപവേദാർത്ഥം", "(c) രാമചരിതം", "(d) ഉണ്ണുനീലി"],
+    "correctAnswer": "(b) സംക്ഷേപവേദാർത്ഥം"
+},
+{
+    "question": "മലയാളത്തിലെ ആദ്യ പത്രമാസിക ഏത്?",
+    "answers": ["(a) രാജ്യസമാചാരം", "(b) ജ്ഞാനനിക്ഷേപം", "(c) പശ്ചിമോദയം", "(d) കേരളമിത്രം"],
+    "correctAnswer": "(a) രാജ്യസമാചാരം"
+},
+{
+    "question": "കേരളത്തിലെ ഔഷധസസ്യങ്ങളെക്കുറിച്ചുണ്ടായ ആദ്യ ഗ്രന്ഥം ഏത്?",
+    "answers": ["(a) ഹോർത്തുസ് മലബാറിക്കൂസ്", "(b) രാജ്യസമാചാരം", "(c) ലീലാതിലകം", "(d) വേദതർക്കം"],
+    "correctAnswer": "(a) ഹോർത്തുസ് മലബാറിക്കൂസ്"
+},
+{
+    "question": "മശിഹാചരിത്രം പുത്തൻപാന എന്ന കൃതി രചിച്ച മിഷനറി ആര്?",
+    "answers": ["(a) ഹെർമൻ ഗുണ്ടർട്ട്", "(b) ബഞ്ചമിൻ ബേ", "(c) ഫാ. ക്ലമൻ്റ്", "(d) അർണ്ണോസ് പാതിരി"],
+    "correctAnswer": "(d) അർണ്ണോസ് പാതിരി"
+},
+{
+    "question": "മലയാള മനോരമയുടെ സ്ഥാപക പത്രാധിപർ ആര്?",
+    "answers": ["(a) ഗുണ്ടർട്ട്", "(b) കെ.പി. കേശവമേനോൻ", "(c) കണ്ടത്തിൽ വർഗ്ഗീസ് മാപ്പിള", "(d) മാണ"],
+    "correctAnswer": "(c) കണ്ടത്തിൽ വർഗ്ഗീസ് മാപ്പിള"
+},
+{
+    "question": "തോമാശ്ലീഹായുടെ പ്രേഷിത ദൗത്യം പ്രമേയമാകുന്ന കാവ്യമേജ് ഏത്?",
+    "answers": ["(a) പള്ളിപ്പാട്ട്", "(b) മാർഗ്ഗംകളിപ്പാട്ട്", "(c) അയനിപ്പാട്ട്", "(d) അടച്ചു"],
+    "correctAnswer": "(b) മാർഗ്ഗംകളിപ്പാട്ട്"
+},
+{
+    "question": "മാറുമറയ്ക്കൽ അവകാശത്തിനുവേണ്ടി നടന്ന സമരമേത്?",
+    "answers": ["(a) മലബാർ കലാപം", "(b) പാലിയം സമരം", "(c) മൊറാഴസമരം","(d) ചാന്നാർ കലാപം"],
+    "correctAnswer": "(d) ചാന്നാർ കലാപം"
+},
+{
+    "question": "സാധുജന പരിപാലന സംഘം സ്ഥാപിച്ചതാര്?",
+    "answers": ["(a) ശ്രീനാരായണഗുരു", "(b) സഹോദരൻ അയ്യപ്പൻ", "(c) കെ.പി. കറുപ്പൻ", "(d) അയ്യങ്കാളി"],
+    "correctAnswer": "(d) അയ്യങ്കാളി"
+},
+{
+    "question": "ആധുനിക മലയാള ഗദ്യത്തിന്റെ പൂർവ്വമാതൃകയെന്ന് പറയാവുന്നത് ഏതിന്?",
+    "answers": ["(a) ബ്രഹ്മാഡ പുരാണം", "(b) ഉദയംപേരൂർ സുനഹദോസ് കാനോനകൾ", "(c) രാജസമാചാരം", "(d) അടച്ചുതുറപ്പാട്ട്"],
+    "correctAnswer": "(b) ഉദയംപേരൂർ സുനഹദോസ് കാനോനകൾ"
+},
+{
+    "question": "ലക്ഷണയുക്തമായ ആദ്യ മലയാള നോവൽ ഏത്?",
+    "answers": ["(a) ഇന്ദുലേഖ", "(b) കുന്ദലത", "(c) പുല്ലേലിക്കുഞ്ചു", "(d) മാർത്താണ്ഡവർമ്മ"],
+    "correctAnswer": "(a) ഇന്ദുലേഖ"
+},
+{
+    "question": "ചരിത്രനോവലുകളെഴുതി ശ്രദ്ധേയനായ സാഹത്യകാരൻ?",
+    "answers": ["(a) ഒ.ചന്തുമേനോൻ", "(b) സി.വി.രാമൻപിള്ള", "(c) അപ്പൻ തമ്പുരാൻ", "(d) ഹെർമ്മൻ ഗുണ്ടർട്ട്"],
+    "correctAnswer": "(b) സി.വി.രാമൻപിള്ള"
+},
+{
+    "question": "മലബാർ മാന്വൽ രചിച്ചതാര്?",
+    "answers": ["(a) വില്യം ലോഗൻ", "(b) ഹെർമ്മൻ ഗുണ്ടർട്ട്", "(c) വി. രാമൻപിള്ള", "(d) കേണൽ മക്കാള"],
+    "correctAnswer": "(a) വില്യം ലോഗൻ"
+},
+{
+    "question": "കേരളത്തെ ഭ്രാന്താലയം എന്നു വിശേഷിപ്പിച്ചാർ?",
+    "answers": ["(a) ചട്ടമ്പിസ്വാമികൾ", "(b) ശ്രീനാരായണഗുരു", "(c) സ്വാമിവിവേകാനന്ദൻ", "(d) മഹാര"],
+    "correctAnswer": "(c) സ്വാമിവിവേകാനന്ദൻ"
+},
+{
+    "question": "ഈഴവ മെമ്മൊറിയലിന് നേതൃത്വം നല്കിയ പരിഷ്കർത്താവ്?",
+    "answers": ["(a) സഹോദരൻ അയ്യപ്പൻ", "(b) കെ.പി. കറുപ്പ മാരനാശാൻ", "(c) വി. രാമൻപിള്ള", "(d) പി. പൽപ്പു"],
+    "correctAnswer": "(d) പി. പൽപ്പു"
+},
+{
+    "question": "നായർ സമുദായത്തിന്റെ സാമൂഹിക പരിഷ്‌കരണത്തിന് നേതൃത്വം നല്കിയ സാമൂഹിക പരിഷ്കർത്താവാര്?",
+    "answers": ["(a) അർണ്ണോസ് പാതിരി", "(b) ചട്ടമ്പി സ്വാമികൾ", "(c) വില്വം ലോഗൻ", "(d) സി കേശവൻ"],
+    "correctAnswer": "(b) ചട്ടമ്പി സ്വാമികൾ"
+},
+{
+    "question": "എസ്.എൻ.ഡി.പി യോഗം സ്ഥാപിച്ചതാര്?",
+    "answers": ["(a) സ്വാമി വിവേകാനന്ദൻ", "(b) ചട്ടമ്പിസ്വാമികൾ", "(c) ശ്രീനാരായണ ഗുരു", "(d) മന്നത്തു പത്മനാഭൻ"],
+    "correctAnswer": "(c) ശ്രീനാരായണ ഗുരു"
+},
+{
+    "question": "മിശ്രഭോജനം സമരമാർഗ്ഗമാക്കിയ സാമൂഹിക പരിഷ്കർത്താവ്",
+    "answers": ["(a) ശ്രീനാരായണഗുരു", "(b) ചട്ടമ്പിസ്വാമി", "(c) പണ്ഡിറ്റ് കറുപ്പൻ", "(d) സഹോദരൻ അയ്യപ്പൻ"],
+    "correctAnswer": "(d) സഹോദരൻ അയ്യപ്പൻ"
+},
+{
+    "question": "നമ്പൂതിരി സമുദായത്തിന്റെ സാമൂഹിക ഉന്നമനത്തിനുവേണ്ടി സ്ഥാപിക്കപ്പെട്ട സംഘടനയേത്?",
+    "answers": ["(a) യോഗക്ഷേമ സഭ", "(b) ആര്യസമാജം", "(c) എൻ.എസ്.എസ്.", "(d) സഹോദരസമാജം"],
+    "correctAnswer": "(a) യോഗക്ഷേമ സഭ"
+},
+{
+    "question": "അയിത്ത ജാതിക്കാരുടെ സഞ്ചാര സ്വാതന്ത്യത്തിനുവേണ്ടി നടന്ന സുപ്രധാന സമരമേത്?",
+    "answers": ["(a) ചാന്നാർ കലാപം", "(b) വൈക്കം സത്യാഗ്രഹം", "(c) മിശ്രഭോജന സമരം", "(d) വയ"],
+    "correctAnswer": "(b) വൈക്കം സത്യാഗ്രഹം"
+},
+{
+    "question": "ക്ഷേത്ര പ്രവേശന വിളംബരം പുറപ്പെടുവിച്ച രാജാവ് ആര്?",
+    "answers": ["(a) മാർത്താണ്ഡവർമ്മ", "(b) ധർമ്മരാജ", "(c) ശ്രീചിത്തിര തിരുനാൾ", "(d) സ്വാതി തിരുന്ന"],
+    "correctAnswer": "(c) ശ്രീചിത്തിര തിരുനാൾ"
+},
+{
+    "question": "ഗുരുവായൂർ സമരത്തിന് നേതൃത്വം നല്‌കിയ സന്നദ്ധസംഘം നേതാവ്?",
+    "answers": ["(a) മന്നത്തു പത്മനാഭൻ", "(b) സഹോദരൻ അയ്യപ്പൻ", "(c) വി.ടി.ഭട്ടതി", "(d) കെ.പി. കേശവൻ"],
+    "correctAnswer": "(b) സഹോദരൻ അയ്യപ്പൻ"
+}
+        ];
+
+        // Add shuffling functionality for questions
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Shuffle quiz data before starting the quiz
+        const shuffledQuizData = shuffleArray(quizData);
+
+        let currentQuestion = 0;
+        let correctAnswers = 0;
+        let timer;
+        let isPaused = false;
+        const timePerQuestion = 15; // Time limit per question in seconds
+
+        function startQuiz() {
+            document.getElementById('startButton').style.display = 'none';
+            document.getElementById('skipButton').style.display = 'block';
+            document.getElementById('quizContent').style.display = 'block';
+            renderQuestion();
+            startTimer();
+        }
+
+        function startTimer() {
+            let timeLeft = timePerQuestion;
+            timer = setInterval(() => {
+                if (!isPaused) {
+                    timeLeft--;
+                    document.getElementById('timer').textContent = timeLeft;
+                    const progressBar = document.getElementById('progressBar');
+                    progressBar.style.width = `${(timeLeft / timePerQuestion) * 100}%`;
+                    if (timeLeft <= 0) {
+                        clearInterval(timer);
+                        checkAnswer('timeout');
+                    }
+                }
+            }, 1000);
+        }
+
+        function pauseResumeQuiz() {
+            const button = document.getElementById('pauseResumeButton');
+            if (isPaused) {
+                button.textContent = 'Pause';
+                isPaused = false;
+                startTimer();
+            } else {
+                button.textContent = 'Resume';
+                isPaused = true;
+                clearInterval(timer);
+            }
+        }
+
+        function skipQuestion() {
+            clearInterval(timer);
+            checkAnswer('skip');
+        }
+
+        function renderQuestion() {
+            const currentQuizData = shuffledQuizData[currentQuestion];
+            const quizContent = document.getElementById('quizContent');
+            quizContent.innerHTML = `
+                <div class="question">
+                    <p>${currentQuizData.question}</p>
+                    ${currentQuizData.answers.map(answer => `<button class="answer">${answer}</button>`).join('')}
+                </div>
+            `;
+            const answerButtons = document.querySelectorAll('.answer');
+            answerButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    clearInterval(timer);
+                    checkAnswer(button.textContent);
+                    // Add this line to reset colors when a new answer is selected
+                    answerButtons.forEach(btn => btn.classList.remove('correct', 'incorrect'));
+                    // Add this line to highlight the selected answer
+                    button.classList.add(button.textContent === currentQuizData.correctAnswer ? 'correct' : 'incorrect');
+                });
+            });
+        }
+
+        function checkAnswer(answer) {
+            const currentQuizData = shuffledQuizData[currentQuestion];
+            const scoreElement = document.getElementById('score');
+            if (answer === 'timeout' || answer === 'skip') {
+                if (answer === 'timeout') {
+                    showAnswerStatus('Time Out!', 'incorrect');
+                } else {
+                    showAnswerStatus('Question Skipped!', 'incorrect');
+                }
+            } else if (answer === currentQuizData.correctAnswer) {
+                correctAnswers++;
+                scoreElement.textContent = correctAnswers;
+                showAnswerStatus('Correct!', 'correct');
+            } else {
+                showAnswerStatus('Incorrect!', 'incorrect');
+            }
+            currentQuestion++;
+            if (currentQuestion < shuffledQuizData.length) {
+                setTimeout(() => {
+                    renderQuestion();
+                    startTimer();
+                }, 1000);
+            } else {
+                setTimeout(showResult, 1000);
+            }
+        }
+
+        function showAnswerStatus(message, status) {
+            const quizContent = document.getElementById('quizContent');
+            const answerStatus = document.createElement('p');
+            answerStatus.textContent = message;
+            answerStatus.classList.add('answer-status');
+            answerStatus.classList.add(status);
+            quizContent.appendChild(answerStatus);
+        }
+
+        function showResult() {
+            clearInterval(timer);
+            const quizContent = document.getElementById('quizContent');
+            quizContent.innerHTML = `
+                <div class="result-container">
+                    <h2 class="result-message">Quiz Completed!</h2>
+                    <div class="result-stats">
+                        <p>Total Questions: ${shuffledQuizData.length}</p>
+                        <p>Correct Answers: ${correctAnswers}</p>
+                        <p>Percentage: ${((correctAnswers / shuffledQuizData.length) * 100).toFixed(2)}%</p>
+                    </div>
+                    <button class="restart-button" onclick="window.location.reload()">Restart Quiz</button>
+                </div>
+            `;
+        }
+
+        document.getElementById('startButton').addEventListener('click', startQuiz);
+        document.getElementById('skipButton').addEventListener('click', skipQuestion);
+        document.getElementById('pauseResumeButton').addEventListener('click', pauseResumeQuiz);
+    </script>
+</body>
+</html>
+
